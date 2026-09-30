@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>小镇鲜市</title>
+<meta name="theme-color" content="#2fae5a">
+<meta name="description" content="经营你的小镇超市：种菜、进货、收银、开二楼和美食广场，还能和朋友联机。">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --pill-bg:rgba(255,255,255,.94);--pill-ink:#1f3a2a;--shadow:0 3px 0 rgba(0,0,0,.18);--toast-bg:#fff6d6;--toast-ink:#5a3b00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pill-bg:rgba(28,38,32,.92);--pill-ink:#eaf7ee;--toast-bg:#3a3220;--toast-ink:#ffe7a6}}
+:root[data-theme="dark"]{--pill-bg:rgba(28,38,32,.92);--pill-ink:#eaf7ee;--toast-bg:#3a3220;--toast-ink:#ffe7a6}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hud{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;justify-content:space-between;align-items:center;padding:0 12px;pointer-events:none;z-index:5}
+.pill{background:var(--pill-bg);color:var(--pill-ink);border-radius:999px;padding:5px 14px 5px 10px;font-weight:900;font-size:19px;display:flex;align-items:center;gap:6px;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+.pill.pulse{animation:pulse .22s ease-out}
+@keyframes pulse{50%{transform:scale(1.1)}}
+.btns{display:flex;gap:6px}
+.btn{pointer-events:auto;border:0;background:var(--pill-bg);color:var(--pill-ink);height:36px;min-width:36px;border-radius:999px;font-size:15px;font-weight:800;box-shadow:var(--shadow);cursor:pointer;padding:0 10px;font-family:inherit}
+.btn:focus-visible{outline:3px solid #ffd23f;outline-offset:2px}
+#hint{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 34px);transform:translateX(-50%);background:rgba(20,40,25,.55);color:#fff;padding:9px 18px;border-radius:999px;font-weight:800;font-size:15px;pointer-events:none;transition:opacity .6s;z-index:5;white-space:nowrap}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 96px);transform:translate(-50%,-10px);background:var(--toast-bg);color:var(--toast-ink);padding:8px 18px;border-radius:14px;font-weight:900;font-size:16px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:6;box-shadow:var(--shadow);white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#joy{position:fixed;width:116px;height:116px;margin:-58px 0 0 -58px;border-radius:50%;background:rgba(255,255,255,.22);border:3px solid rgba(255,255,255,.6);pointer-events:none;display:none;z-index:6}
+#knob{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.panel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,calc(100% - 32px));background:var(--pill-bg);color:var(--pill-ink);border-radius:22px;padding:18px 18px 14px;box-shadow:0 10px 40px rgba(0,0,0,.25);z-index:10;font-size:15px}
+.panel[hidden]{display:none}
+.panel h3{margin:0 0 4px;font-size:19px}
+.panel .sub{margin:0 0 12px;font-size:12.5px;opacity:.75;line-height:1.45}
+.panel .row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.panel input{flex:1;min-width:0;border:2px solid rgba(0,0,0,.12);border-radius:12px;padding:9px 10px;font:inherit;font-weight:800;background:transparent;color:inherit}
+.panel .big{flex:1;border:0;border-radius:14px;padding:11px 12px;font:inherit;font-weight:900;cursor:pointer;background:#2fae5a;color:#fff}
+.panel .big.alt{background:#4a90e2}.panel .big.warn{background:#e0564b}.panel .big.ghost{background:rgba(0,0,0,.08);color:inherit}
+.panel .code{font-size:34px;font-weight:900;letter-spacing:6px;text-align:center;margin:6px 0;font-variant-numeric:tabular-nums}
+.panel .plist{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.panel .chip{border-radius:999px;padding:4px 10px;font-weight:800;font-size:13px;color:#fff}
+.panel .status{font-size:13px;min-height:18px;margin:4px 0;font-weight:700}
+#emoBar{position:fixed;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:none;flex-direction:column;gap:6px;z-index:6}
+#emoBar button{width:44px;height:44px;border-radius:50%;border:0;background:var(--pill-bg);font-size:22px;box-shadow:var(--shadow);cursor:pointer}
+.card{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 54px);width:min(240px,calc(100% - 24px));background:var(--pill-bg);color:var(--pill-ink);border-radius:16px;box-shadow:var(--shadow);z-index:5;font-size:12.5px;overflow:hidden}
+.card .hd{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;font-weight:900;cursor:pointer;gap:6px;white-space:nowrap;font-size:12px}
+.card .bd{padding:0 10px 8px}
+.card .bd[hidden]{display:none}
+.card .sec{font-weight:900;margin:6px 0 3px;font-size:12px;opacity:.8}
+.card .goal{margin:3px 0}
+.card .bar{height:5px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden;margin-top:2px}
+.card .bar i{display:block;height:100%;background:#2fae5a}
+.card .goal.ok{opacity:.55;text-decoration:line-through}
+#dlg{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);width:min(420px,calc(100% - 24px));background:var(--pill-bg);color:var(--pill-ink);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.28);z-index:12;padding:14px 16px 12px;display:flex;gap:12px;align-items:flex-start}
+#dlg[hidden]{display:none}
+#dlg .face{font-size:40px;line-height:1}
+#dlg .who{font-weight:900;font-size:14px;margin-bottom:3px}
+#dlg .txt{font-size:15px;line-height:1.5}
+#dlg .next{margin-top:8px;border:0;border-radius:12px;padding:8px 14px;font:inherit;font-weight:900;background:#2fae5a;color:#fff;cursor:pointer;float:right}
+#menu{position:fixed;inset:0;background:rgba(20,40,25,.55);z-index:14;display:flex;align-items:center;justify-content:center}
+#menu[hidden]{display:none}
+#menu .box{background:var(--pill-bg);color:var(--pill-ink);border-radius:24px;padding:22px 20px;width:min(340px,calc(100% - 32px));text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+#menu h2{margin:0 0 4px;font-size:26px}
+#menu p{margin:0 0 16px;font-size:13px;opacity:.75}
+#menu button{display:block;width:100%;margin:8px 0;border:0;border-radius:16px;padding:13px;font:inherit;font-weight:900;font-size:16px;cursor:pointer;color:#fff;background:#2fae5a}
+#menu button.alt{background:#4a90e2}
+#menu small{display:block;font-weight:600;font-size:12px;opacity:.9;margin-top:2px}
+.tabs{display:flex;gap:6px;margin-bottom:8px}.tabs button{flex:1;border:0;border-radius:12px;padding:8px 0;font-size:19px;background:rgba(0,0,0,.07);cursor:pointer}.tabs button.on{background:#2fae5a}
+.hubBody{max-height:56vh;overflow:auto;-webkit-overflow-scrolling:touch}.hubBody[hidden]{display:none}
+.li{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid rgba(0,0,0,.07)}.li .e{font-size:20px;min-width:30px;text-align:center;font-weight:900}.li .t{flex:1;min-width:0}.li .t b{display:block;font-size:14px}.li .t small{opacity:.7;font-size:12px}
+.li .bar{height:5px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden;margin-top:3px}.li .bar i{display:block;height:100%;background:#2fae5a}
+.sbtn{border:0;border-radius:10px;padding:7px 10px;font:inherit;font-weight:800;font-size:13px;background:#2fae5a;color:#fff;cursor:pointer;white-space:nowrap}.sbtn.ghost{background:rgba(0,0,0,.08);color:inherit}.sbtn[disabled]{opacity:.55;cursor:default}
+#hub{width:min(380px,calc(100% - 24px))}
+@media (prefers-reduced-motion:reduce){.pill.pulse{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="hud">
+  <div class="pill" id="money"><span>💵</span><span id="mval">0</span></div>
+  <div class="btns">
+    <button class="btn" id="saveBtn" aria-label="保存进度">💾</button>
+    <button class="btn" id="storyBtn" aria-label="故事">📖</button>
+    <button class="btn" id="mpBtn" aria-label="和朋友一起玩">👥</button>
+    <button class="btn" id="hubBtn" aria-label="排行榜、成就、装扮与设置">⭐</button>
+    <button class="btn" id="acBtn" aria-label="玩家ID与云存档">👤</button>
+  </div>
+</div>
+<div id="hint">按住屏幕拖动来移动</div>
+<div id="toast"></div>
+<div class="panel" id="mp" hidden role="dialog" aria-label="联机">
+  <h3>👥 和朋友一起开店</h3>
+  <p class="sub">房主的店是大家共用的：一起搬货、收银，钱进同一个钱包。把网址发给朋友，他打开后点 👥 输入房间号就能加入。最多 5 人。</p>
+  <div class="row"><span>昵称</span><input id="nick" maxlength="8" autocomplete="off"></div>
+  <div id="mpIdle">
+    <div class="row"><button class="big" id="mpHost">创建房间</button></div>
+    <div class="row"><input id="mpCode" maxlength="4" placeholder="房间号" autocomplete="off" inputmode="latin"><button class="big alt" id="mpJoin" style="flex:0 0 auto">加入</button></div>
+  </div>
+  <div id="mpIn" hidden>
+    <div class="code" id="mpCodeShow">----</div>
+    <div class="plist" id="mpPlayers"></div>
+    <div class="row"><button class="big warn" id="mpLeave">离开房间</button></div>
+  </div>
+  <div class="status" id="mpStatus"></div>
+  <div class="row"><button class="big ghost" id="mpClose">关闭</button></div>
+</div>
+<div class="panel" id="ac" hidden role="dialog" aria-label="账号与设置">
+  <h3>👤 玩家ID与云存档</h3>
+  <div id="acBody"></div>
+  <div class="status" id="acStatus"></div>
+  <div class="row"><button class="big ghost" id="acClose">关闭</button></div>
+</div>
+<div class="panel" id="hub" hidden role="dialog" aria-label="更多">
+  <div class="tabs" id="hubTabs"><button data-t="rank" aria-label="排行榜">🏆</button><button data-t="ach" aria-label="成就">🎖️</button><button data-t="vip" aria-label="常客">⭐</button><button data-t="decor" aria-label="装扮">🎨</button><button data-t="set" aria-label="设置">⚙️</button></div>
+  <div class="hubBody" id="hubBody"></div>
+  <div class="hubBody" id="hubSet" hidden>
+    <div class="row"><span>昵称</span><input id="nick2" maxlength="8" autocomplete="off"></div>
+    <div class="row"><button class="big ghost" id="musBtn">🎵 音乐：开</button><button class="big ghost" id="snd">🔊 音效：开</button></div>
+    <div class="sub" style="margin:8px 0 2px;font-weight:800">画质</div>
+    <div class="row"><button class="big" id="gfx-high">精美</button><button class="big" id="gfx-mid">标准</button><button class="big" id="gfx-low">流畅</button></div>
+    <div class="row"><button class="big ghost" id="fpsBtn">🔋 省电 30 帧：关</button></div>
+    <div class="row"><button class="big ghost" id="rst">↺ 重新开始（清空本机进度）</button></div>
+  </div>
+  <div class="status" id="hubStatus"></div>
+  <div class="row"><button class="big ghost" id="hubClose">关闭</button></div>
+</div>
+<div id="emoBar"><button data-e="👋">👋</button><button data-e="❤️">❤️</button><button data-e="😂">😂</button><button data-e="👍">👍</button></div>
+<div class="card" id="card"><div class="hd" id="cardHd"><span id="clock">☀️ 第1天 06:00</span><span style="opacity:.8">🏪<span id="pval">0/0</span> <span id="cardTg">▾</span></span></div><div class="bd" id="cardBd"><div id="storyBox"></div><div id="dailyBox"></div></div></div>
+<div id="dlg" hidden><div class="face" id="dlgFace">👵</div><div style="flex:1"><div class="who" id="dlgWho">阿婆</div><div class="txt" id="dlgTxt"></div><button class="next" id="dlgNext">继续</button></div></div>
+<div id="menu" hidden><div class="box"><h2>🍅 小镇鲜市</h2><p>选择一种玩法（之后随时可以在 📖 里切换）</p>
+<button id="mStory">📖 故事模式<small>帮阿婆把老菜摊变成全镇最热闹的超市</small></button>
+<button class="alt" id="mFree">🛒 自由模式<small>没有剧情，想怎么经营就怎么经营</small></button></div></div>
+<div id="joy"><div id="knob"></div></div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/supabase.js"></script>
+<script src="config.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

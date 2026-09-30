@@ -1,0 +1,17 @@
+{
+  "name": "小镇鲜市",
+  "short_name": "小镇鲜市",
+  "description": "经营你的小镇超市：种菜、进货、收银，还能和朋友联机。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#8fd96b",
+  "theme_color": "#2fae5a",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

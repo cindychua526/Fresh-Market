@@ -1,0 +1,27 @@
+# 小镇鲜市 · Netlify 设置
+#
+# 从 GitHub 发布时，Netlify 会运行下面的 command：
+#   如果你在 Netlify 后台填了 SUPABASE_URL 和 SUPABASE_ANON_KEY 这两个环境变量，
+#   就会自动生成 config.js（GitHub 上的 config.js 可以保持空白）。
+#   如果没填，就保留仓库里原来的 config.js 不动。
+# 用拖拽上传（app.netlify.com/drop）时，这条命令不会运行，请直接改 config.js。
+
+[build]
+  publish = "."
+  command = "if [ -n \"$SUPABASE_URL\" ] && [ -n \"$SUPABASE_ANON_KEY\" ]; then printf 'window.FM_CONFIG={supabaseUrl:\"%s\",supabaseAnonKey:\"%s\"};\\n' \"$SUPABASE_URL\" \"$SUPABASE_ANON_KEY\" > config.js && echo 'config.js 已从环境变量生成'; else echo '没有设置环境变量，使用仓库里的 config.js'; fi"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/config.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
