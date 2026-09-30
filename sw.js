@@ -1,8 +1,8 @@
 // 离线缓存：让游戏可以"添加到主屏幕"，没网也能打开单机模式。
 // 每次更新游戏时把版本号 +1，玩家下次打开就会拿到新版本。
-const VERSION = 'fm-v2';
+const VERSION = 'fm-v4';
 const SHELL = ['./', 'index.html', 'game.js', 'config.js', 'manifest.webmanifest',
-  'vendor/three.min.js', 'vendor/supabase.js', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
+  'i18n.js', 'vendor/three.min.js', 'vendor/supabase.js', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

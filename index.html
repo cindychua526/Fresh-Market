@@ -54,7 +54,7 @@ body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFa
 .card .bar{height:5px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden;margin-top:2px}
 .card .bar i{display:block;height:100%;background:#2fae5a}
 .card .goal.ok{opacity:.55;text-decoration:line-through}
-#dlg{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);width:min(420px,calc(100% - 24px));background:var(--pill-bg);color:var(--pill-ink);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.28);z-index:12;padding:14px 16px 12px;display:flex;gap:12px;align-items:flex-start}
+#dlg{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);width:min(420px,calc(100% - 24px));background:var(--pill-bg);color:var(--pill-ink);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.28);z-index:9;padding:14px 16px 12px;display:flex;gap:12px;align-items:flex-start}
 #dlg[hidden]{display:none}
 #dlg .face{font-size:40px;line-height:1}
 #dlg .who{font-weight:900;font-size:14px;margin-bottom:3px}
@@ -74,6 +74,12 @@ body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFa
 .li .bar{height:5px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden;margin-top:3px}.li .bar i{display:block;height:100%;background:#2fae5a}
 .sbtn{border:0;border-radius:10px;padding:7px 10px;font:inherit;font-weight:800;font-size:13px;background:#2fae5a;color:#fff;cursor:pointer;white-space:nowrap}.sbtn.ghost{background:rgba(0,0,0,.08);color:inherit}.sbtn[disabled]{opacity:.55;cursor:default}
 #hub{width:min(380px,calc(100% - 24px))}
+.stock{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 4px}.chip2{border:0;border-radius:10px;background:rgba(255,90,77,.14);padding:3px 7px;font-size:15px;cursor:pointer;text-align:center;color:inherit;font-family:inherit}
+#tip{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);transform:translate(-50%,10px);width:min(360px,calc(100% - 32px));background:#1f3a2a;color:#fff;padding:10px 14px;border-radius:16px;font-weight:800;font-size:14px;line-height:1.45;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:7;box-shadow:0 6px 20px rgba(0,0,0,.25);text-align:center}
+#tip.on{opacity:1;transform:translate(-50%,0)}
+#upd{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 54px);transform:translateX(-50%);z-index:13;border:0;border-radius:999px;padding:9px 16px;font:inherit;font-weight:900;background:#4a90e2;color:#fff;box-shadow:var(--shadow);cursor:pointer}
+#upd[hidden]{display:none}
+.tabs button{font-size:17px}
 @media (prefers-reduced-motion:reduce){.pill.pulse{animation:none}}
 </style>
 </head>
@@ -91,6 +97,8 @@ body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFa
 </div>
 <div id="hint">按住屏幕拖动来移动</div>
 <div id="toast"></div>
+<div id="tip"></div>
+<button id="upd" hidden></button>
 <div class="panel" id="mp" hidden role="dialog" aria-label="联机">
   <h3>👥 和朋友一起开店</h3>
   <p class="sub">房主的店是大家共用的：一起搬货、收银，钱进同一个钱包。把网址发给朋友，他打开后点 👥 输入房间号就能加入。最多 5 人。</p>
@@ -105,6 +113,8 @@ body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFa
     <div class="row"><button class="big warn" id="mpLeave">离开房间</button></div>
   </div>
   <div class="status" id="mpStatus"></div>
+  <div class="row" id="mpFail" hidden><button class="big alt" id="mpRetry">重试</button><button class="big ghost" id="mpBack">回到自己的店</button></div>
+  <div class="row"><button class="big ghost" id="mpTest">🔧 联机测试</button></div>
   <div class="row"><button class="big ghost" id="mpClose">关闭</button></div>
 </div>
 <div class="panel" id="ac" hidden role="dialog" aria-label="账号与设置">
@@ -114,7 +124,7 @@ body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFa
   <div class="row"><button class="big ghost" id="acClose">关闭</button></div>
 </div>
 <div class="panel" id="hub" hidden role="dialog" aria-label="更多">
-  <div class="tabs" id="hubTabs"><button data-t="rank" aria-label="排行榜">🏆</button><button data-t="ach" aria-label="成就">🎖️</button><button data-t="vip" aria-label="常客">⭐</button><button data-t="decor" aria-label="装扮">🎨</button><button data-t="set" aria-label="设置">⚙️</button></div>
+  <div class="tabs" id="hubTabs"><button data-t="rank" aria-label="排行榜">🏆</button><button data-t="ach" aria-label="成就">🎖️</button><button data-t="book" aria-label="图鉴">📚</button><button data-t="vip" aria-label="常客">⭐</button><button data-t="decor" aria-label="装扮">🎨</button><button data-t="branch" aria-label="开分店">🏪</button><button data-t="set" aria-label="设置">⚙️</button></div>
   <div class="hubBody" id="hubBody"></div>
   <div class="hubBody" id="hubSet" hidden>
     <div class="row"><span>昵称</span><input id="nick2" maxlength="8" autocomplete="off"></div>
@@ -122,13 +132,16 @@ body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFa
     <div class="sub" style="margin:8px 0 2px;font-weight:800">画质</div>
     <div class="row"><button class="big" id="gfx-high">精美</button><button class="big" id="gfx-mid">标准</button><button class="big" id="gfx-low">流畅</button></div>
     <div class="row"><button class="big ghost" id="fpsBtn">🔋 省电 30 帧：关</button></div>
+    <div class="row"><button class="big ghost" id="vibBtn">📳 震动：开</button><button class="big ghost" id="joyBtn">🕹️ 摇杆：跟随手指</button></div>
+    <div class="sub" style="margin:8px 0 2px;font-weight:800">🌐 语言 · Language · Bahasa</div>
+    <div class="row"><button class="big" id="lang-zh">中文</button><button class="big" id="lang-en">English</button><button class="big" id="lang-ms">Melayu</button></div>
     <div class="row"><button class="big ghost" id="rst">↺ 重新开始（清空本机进度）</button></div>
   </div>
   <div class="status" id="hubStatus"></div>
   <div class="row"><button class="big ghost" id="hubClose">关闭</button></div>
 </div>
 <div id="emoBar"><button data-e="👋">👋</button><button data-e="❤️">❤️</button><button data-e="😂">😂</button><button data-e="👍">👍</button></div>
-<div class="card" id="card"><div class="hd" id="cardHd"><span id="clock">☀️ 第1天 06:00</span><span style="opacity:.8">🏪<span id="pval">0/0</span> <span id="cardTg">▾</span></span></div><div class="bd" id="cardBd"><div id="storyBox"></div><div id="dailyBox"></div></div></div>
+<div class="card" id="card"><div class="hd" id="cardHd"><span id="clock">☀️ 第1天 06:00</span><span style="opacity:.8">🏪<span id="pval">0/0</span> <span id="cardTg">▾</span></span></div><div class="bd" id="cardBd"><div id="storyBox"></div><div id="stockBox"></div><div id="dailyBox"></div></div></div>
 <div id="dlg" hidden><div class="face" id="dlgFace">👵</div><div style="flex:1"><div class="who" id="dlgWho">阿婆</div><div class="txt" id="dlgTxt"></div><button class="next" id="dlgNext">继续</button></div></div>
 <div id="menu" hidden><div class="box"><h2>🍅 小镇鲜市</h2><p>选择一种玩法（之后随时可以在 📖 里切换）</p>
 <button id="mStory">📖 故事模式<small>帮阿婆把老菜摊变成全镇最热闹的超市</small></button>
@@ -138,6 +151,7 @@ body{margin:0;height:100%;overflow:hidden;background:#8fd96b;font-family:"PingFa
 <script src="vendor/three.min.js"></script>
 <script src="vendor/supabase.js"></script>
 <script src="config.js"></script>
+<script src="i18n.js"></script>
 <script src="game.js"></script>
 </body>
 </html>
