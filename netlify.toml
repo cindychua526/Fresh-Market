@@ -10,6 +10,12 @@
   publish = "."
   command = "if [ -n \"$SUPABASE_URL\" ] && [ -n \"$SUPABASE_ANON_KEY\" ]; then printf 'window.FM_CONFIG={supabaseUrl:\"%s\",supabaseAnonKey:\"%s\"};\\n' \"$SUPABASE_URL\" \"$SUPABASE_ANON_KEY\" > config.js && echo 'config.js 已从环境变量生成'; else echo '没有设置环境变量，使用仓库里的 config.js'; fi"
 
+# Supabase 的 Project URL 和 anon / publishable key 本来就是公开给网页用的，
+# 所以告诉 Netlify 的"密钥扫描"不用拦截这两个变量。
+# （真正的机密 service_role / secret key 绝对不要放进环境变量或任何文件。）
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL,SUPABASE_ANON_KEY"
+
 [[headers]]
   for = "/sw.js"
   [headers.values]
