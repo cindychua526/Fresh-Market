@@ -1,0 +1,13 @@
+{
+  "name": "fresh-market",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:three": "node tools/build-three.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.23.1",
+    "three": "0.128.0"
+  }
+}

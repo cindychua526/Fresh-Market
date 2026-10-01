@@ -1,6 +1,7 @@
 # 小镇鲜市 · Netlify 设置
 #
 # 从 GitHub 发布时，Netlify 会运行下面的 command：
+#   先用 build.mjs 把 src/ 里的源码合并、压缩成 game.min.js（Netlify 会自动 npm install）；
 #   如果你在 Netlify 后台填了 SUPABASE_URL 和 SUPABASE_ANON_KEY 这两个环境变量，
 #   就会自动生成 config.js（GitHub 上的 config.js 可以保持空白）。
 #   如果没填，就保留仓库里原来的 config.js 不动。
@@ -8,7 +9,7 @@
 
 [build]
   publish = "."
-  command = "if [ -n \"$SUPABASE_URL\" ] && [ -n \"$SUPABASE_ANON_KEY\" ]; then printf 'window.FM_CONFIG={supabaseUrl:\"%s\",supabaseAnonKey:\"%s\"};\\n' \"$SUPABASE_URL\" \"$SUPABASE_ANON_KEY\" > config.js && echo 'config.js 已从环境变量生成'; else echo '没有设置环境变量，使用仓库里的 config.js'; fi"
+  command = "node build.mjs && if [ -n \"$SUPABASE_URL\" ] && [ -n \"$SUPABASE_ANON_KEY\" ]; then printf 'window.FM_CONFIG={supabaseUrl:\"%s\",supabaseAnonKey:\"%s\"};\\n' \"$SUPABASE_URL\" \"$SUPABASE_ANON_KEY\" > config.js && echo 'config.js 已从环境变量生成'; else echo '没有设置环境变量，使用仓库里的 config.js'; fi"
 
 # Supabase 的 Project URL 和 anon / publishable key 本来就是公开给网页用的，
 # 所以告诉 Netlify 的"密钥扫描"不用拦截这两个变量。
